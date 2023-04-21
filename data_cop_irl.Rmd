@@ -1,5 +1,5 @@
 ---
-title: "Data Literacy is Data ~~Data Governance~~ Data Enablement"
+title: "Data Literacy is Data ~~Governance~~ Enablement"
 subtitle: "Data Community of Practice IRL Conference"
 author: "Brad Weiner | Chief Data Officer"
 institute: "University of Colorado Boulder"
@@ -78,6 +78,8 @@ background-size: contain
 class: left, top, middle
 background-size: contain
 
+#### Data Governance Includes
+
 .pull-left[
 
 ![](images/unblowupable.jpg)
@@ -85,8 +87,6 @@ background-size: contain
 ]
 
 .pull-right[
-
-#### Data Governance Includes
 
 * Documentation
 * Quality & Modeling
@@ -647,8 +647,10 @@ class: middle, left, inverse
 --
 `r fa("baseball-ball", fill = pal[6])`  Post Steriods: Players were tested and banned for using performance enhancing drugs.
 ---
-class: top, middle
+class: center, middle, left
 background-size: contain
+
+#### How Do We Move From Question to Insight to Action?
 
 .pull-left[
 
@@ -658,26 +660,180 @@ background-size: contain
 
 .pull-right[
 
-#### How Do We Move From Question to Insight to Action?
-
 * Data Literacy also involves our collective efforts to actually _make decisions_ that are informed by data
 * We must learn to communicate results clearly and advocate for policy interventions
 
 ]
 ---
+class: center, middle
+background-image: url(images/flashlight.jpeg)
+background-size: contain
+## Let's Predict Retention
+Reminder: This is an example. Be Careful.
+---
+class: inverse, left, top
+### Explore the Data (this is not real student data)
+```{r,echo=F}
+library(kableExtra)
+d <- read.csv("data/retention_file_raw.csv",stringsAsFactors = F)
+td <- t(head(d))
+colnames(td) <- NULL
+kable(td) %>% column_spec(1,bold = TRUE,) %>% kable_styling(font_size = 14)
+```
+---
+
+class: inverse,left, top
+### Pre-Process the Data 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(fastDummies)
+library(scales)
+d <- dummy_columns(d)
+d <- d %>% mutate_at(c("age","net_tuition","siblings_enrolled","peers_from_hs"), ~ scale(.))
+d <- clean_names(d)
+td <- t(head(d))
+colnames(td) <- NULL
+kable(td) %>% kable_styling(font_size = 13) %>% column_spec(1,bold = T)
+```
+---
+class: inverse, left, top
+### Split Into Training/Test Sets
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(janitor)
+set.seed(1876)
+
+split <- initial_split(d, strata = retained)
+retn_train <- training(split)
+retn_test  <- testing(split)
+
+kable(tabyl(retn_train$retained))
+
+kable(tabyl(retn_test$retained))
+```
+---
+class: inverse, left, top
+### Build Basic Regression Model  
+(reminder, this is just a toy model)
+```{r echo=FALSE, message=FALSE, warning=FALSE, r,echo=T}
+mod.1 <- glm(retained ~  #<<
+               total_peer_group + #<<
+               net_tuition + #<<
+               sex_female + #<<
+               income_group_no_aid, #<<
+             data = retn_train, #<<
+             family = "binomial") #<<
+```
+---
+class: inverse, left, top
+### Review and Interpret the Results
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# kable(exp(mod.1$coefficients),col.names = NULL) %>% kable_styling(font_size = 15)
+kable(tidy(mod.1,exponentiate = TRUE),digits = 3) %>% kable_styling() %>%
+  row_spec(5, bold = T, color = "white", background = "green") %>%
+  row_spec(4, bold = T, color = "white", background = "green") %>%
+  row_spec(2, bold = T, color = "white", background = "red")
+```
+
+--
+### Interpretation 
+
+Students in the Income No Aid Group are [INSERT NUMBER HERE] times more likely to retain than those in the baseline group when controlling for other features  
+
+
+--
+Female Students are [INSERT NUMBER HERE] times more likely to retain than those in the baseline group when controlling for other features
+
+---
+class: inverse, left, top
+### Make New Predictions 
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(ggthemes)
+library(ggeasy)
+
+cugoldtet <- c("#CFB87C",
+               "#7CCF8F",
+               "#7C93CF")
+
+predictions <- predict(mod.1, 
+                       type = "response",
+                       newdata = retn_test) #<<
+
+retn_test$predictions <- round(predictions,digits = 2) 
+
+retn_test <- retn_test %>%
+    mutate(quartile = ntile(predictions,3)) %>%
+    relocate(predictions,.after = student_id) %>%
+    select(student_id : total_peer_group) %>%
+    as.data.frame(.)
+  
+td <- t(retn_test)
+colnames(td) <- NULL
+kable(retn_test,row.names = F) %>% column_spec(2,bold = TRUE) %>% kable_styling(font_size = 10)
+
+# ggplot(data = retn_test ,aes(x = predictions,fill=as.factor(quartile))) +
+#   geom_histogram(binwidth = 0.01,bins = 50) +
+#   ggthemes::theme_tufte() +
+#   scale_fill_manual(values = cugoldtet) +
+#   ggeasy::easy_remove_legend() +
+#   ggeasy::easy_x_axis_labels_size(size = 14) +
+#   ggeasy::easy_x_axis_title_size(size = 14) +
+#   ggeasy::easy_y_axis_labels_size(size = 14) +
+#   ggeasy::easy_y_axis_title_size(size = 14)
+```
+---
+class: center, middle, left
+background-size: contain
+
+#### Based on the Insights from this Analyis, What Recommendations Would We Make?
+
+.pull-left[
+
+![](images/recommendations.jpg)
+
+]
+
+.pull-right[
+
+* Is it feasible?
+* Is it measureable?
+* Is it aligned with the insights?
+* Do we require additional information or analysis?
+
+]
+---
+class: center, middle, left
+background-size: contain
+
+#### How do we enhance Data Literacy Across Campus?
+
+.pull-left[
+
+![](images/welearned.jpg)
+
+]
+
+.pull-right[
+
+* Open Discussion
+
+]
+---
+class: top, left
+background-image: url(images/chalkboard.png)
+background-size: contain
+---
 class: top, left
 background-image: url(images/flashlight_2.jpg)
 background-size: contain
-#### Thank you Tuba for the invitation
-#### This slide deck was created using R, Rmarkdown and the Xaringan Package
-#### Photos pulled from Google Photos and Unsplash. 
+#### This slide deck was created using R, {rmarkdown} and {xaringan}
+#### Photos pulled from Unsplash. Simpsons memes from the Frinkiac 
 #### Errors, Typos, and Oopsies Are Mine. Please let me know if you see something wacky
-#### Code and Slides available at:
+#### Code and Slides available (eventually) at:
 #### [bradweiner.info/talk](https://bradweiner.info/talk/)
-### Go Ahead. Ask me anything!
 
 ### Contact
 ####  `r fa("envelope", fill = "steelblue")`   brad.weiner@colorado.edu
 ####  `r fa("twitter", fill = "steelblue")`    @brad_weiner
 ####  `r fa("desktop", fill = "steelblue")`    bradweiner.info
+####  `r fa("github", fill = "steelblue")`     github.com/bradweiner
 ---
