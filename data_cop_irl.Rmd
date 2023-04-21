@@ -1,0 +1,683 @@
+---
+title: "Data Literacy is Data ~~Data Governance~~ Data Enablement"
+subtitle: "Data Community of Practice IRL Conference"
+author: "Brad Weiner | Chief Data Officer"
+institute: "University of Colorado Boulder"
+date: "2023-04-21"
+output:
+  xaringan::moon_reader:
+    includes:
+    after_body: 
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---       
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+library(ggeasy)
+library(janitor)
+library(tidymodels)
+library(broom)
+library(countdown)
+library(fontawesome)
+library(knitr)
+library(fromthebottom)
+style_duo(primary_color = "#000000",
+          secondary_color = "#ffffff", 
+          header_font_google = google_font("Helvetica Neue"),
+          text_font_google   = google_font("Helvetica Neue Roman", "300", "300i"),
+          code_font_google   = google_font("Helvetica Neue Light"),
+          title_slide_background_image = "images/puzzle.jpg",
+          title_slide_text_color = "black")
+```
+---
+class: inverse, left, top
+```{r load_packages, message=FALSE, warning=FALSE, include=FALSE} 
+library(fontawesome)
+```
+### About Me
+
+####  `r fa("address-card", fill = "steelblue")` Chief Data Officer, University of Colorado Boulder
+
+####  `r fa("university", fill = "steelblue")`      21 years experience in higher education
+####  `r fa("school", fill = "steelblue")`      16 years on campus (Kansas, Vanderbilt, Minnesota, Colorado)
+####  `r fa("database", fill = "steelblue")`        5 years in Ed-Tech/Consultancy
+####  `r fa("laptop-code", fill = "steelblue")`     14 years Higher Ed Analytics/Data Science
+####  `r fa("pen-alt", fill = "steelblue")`      English/Creative Writing Major and Imposter
+
+### Contact
+####  `r fa("envelope", fill = "steelblue")`   brad.weiner@colorado.edu
+####  `r fa("twitter", fill = "steelblue")`    brad_weiner
+####  `r fa("desktop", fill = "steelblue")`    bradweiner.info
+---
+class: left, top, middle
+background-size: contain
+
+###  As A Result of This Presentation You Will:
+
+.pull-left[
+
+![](images/simpsons_soccer.jpg)
+
+]
+
+.pull-right[
+
+
+* Learn How Data Literacy is Part of Data Governance
+* Practice asking better research questions
+* Discuss how to tell better data stories
+* Discuss how to convert data to insight to action
+
+]
+---
+class: left, top, middle
+background-size: contain
+
+.pull-left[
+
+![](images/unblowupable.jpg)
+
+]
+
+.pull-right[
+
+#### Data Governance Includes
+
+* Documentation
+* Quality & Modeling
+* Metadata
+* Master Data Management
+* Data Access Policies
+* Security/Privacy
+* Data Catalog
+* Lifecycle Management
+* _Data Literacy_
+
+
+]
+---
+class: left, top, middle
+background-size: contain
+
+.pull-left[
+
+![](images/whycare.jpg)
+
+]
+
+.pull-right[
+
+#### How Can Data Literacy Help Campus?
+
+* We can ask better questions
+* We can communicate better with data
+* We can turn insights into action
+* We can avoid "data theater"
+
+
+]
+---
+class: left, top, middle
+background-size: contain
+
+.pull-left[
+
+![](images/steamed_hams.jpg)
+
+]
+
+.pull-right[
+
+#### A Scenario:
+
+* You work for a fast food chain
+* Their product team wants you to create a new "healthy" option
+* As expected, they give you no other help
+* You generate the following data set
+* Good analyses start with good questions!
+
+
+]
+---
+class: center, middle, inverse
+### Sample of Fast Food Data from Kaggle (Not Verified)
+
+```{r,echo=F,warning=FALSE, message=FALSE}
+library(kableExtra)
+d <- read.csv("data/fastfood.csv",stringsAsFactors = F)
+d.samp <- sample_n(d,size = 5)
+td <- t(d.samp)
+colnames(td) <- NULL
+kable(td) %>% column_spec(1,bold = TRUE) %>% kable_styling(font_size = 12)
+```
+---
+class: left, top, middle
+background-size: contain
+
+.pull-left[
+
+![](images/joke.jpg)
+
+]
+
+.pull-right[
+
+#### Types of Research Questions
+
+* Descriptive (How many?)
+* Correlational (Does x relate to y?)
+* Predictive (What would we estimate)
+* Prescriptive (What _should_ we do?)
+
+
+]
+---
+class: left, top, middle, inverse
+background-size: contain
+
+.pull-left[
+
+```{r,echo=F,warning=FALSE, message=FALSE}
+library(kableExtra)
+d <- read.csv("data/fastfood.csv",stringsAsFactors = F)
+d.samp <- sample_n(d,size = 5)
+td <- t(d.samp)
+colnames(td) <- NULL
+kable(td) %>% column_spec(1,bold = TRUE) %>% kable_styling(font_size = 10)
+```
+]
+
+.pull-right[
+
+#### Practice Asking Some Research Questions
+
+* Descriptive (How many?)
+* Correlational (Does x relate to y?)
+* Predictive (What would we estimate)
+* Prescriptive (What _should_ we do?)
+
+]
+---
+class: left, top, middle
+background-size: contain
+
+.pull-left[
+
+![](images/storytelling.jpg)
+
+]
+
+.pull-right[
+
+#### Part of Data Literacy is Communicating with Data
+
+* Let's tell a story about some data trends
+* These data are real
+
+
+]
+---
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE,cache=TRUE}
+#this chunk invokes data and does the aggreations
+
+library(Lahman)
+library(janitor)
+library(tidyverse,quietly = T)
+library(magrittr)
+library(zoo)
+
+b <- Lahman::Batting
+head(b)
+
+b %<>% clean_names(.)
+
+b.agg <- b %>%
+    group_by(year_id) %>%
+    summarise(total_ab = sum(ab,na.rm = T),
+              total_hr = sum(hr,na.rm = T)) %>%
+    ungroup() %>%
+    mutate(hr_to_ab_ratio = total_hr/total_ab) %>%
+    as.data.frame(.)
+```
+
+
+```{r fig.asp = 3/4, fig.retina = 3,fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE,cache=TRUE}
+
+#this chunk plots the first thing
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red") +
+    #geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),size = 1.5, lty = "dashed") +
+    #geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) +
+    scale_y_continuous(limits = c(0,0.04),labels = NULL) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20,labels = NULL) +
+    labs(x = "",
+         y = "",
+         title = "What is Going on Here?") 
+
+p
+```
+---
+```{r fig.asp = 3/4, fig.retina = 3, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE,cache=TRUE}
+
+#this chunk plots the first thing
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red") +
+    #geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),size = 1.5, lty = "dashed") +
+    #geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) +
+    scale_y_continuous(limits = c(0,0.04),labels = NULL) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "",
+         title = "Something Happening Between 1870 - 2018") +
+    ggeasy::easy_plot_legend_title_size(size =10) 
+
+
+p
+```
+---
+```{r fig.asp = 3/4, fig.retina = 3, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE,cache=TRUE}
+
+#this chunk plots the first thing
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 0.25) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),size = 1.5, col = "blue", lty = "dashed") +
+    #geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) +
+    scale_y_continuous(limits = c(0,0.04),labels = NULL) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "",
+         title = "Something Happening Between 1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE,cache=TRUE}
+
+#this chunk plots the first thing
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 0.25) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 0.25) +
+    geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    scale_y_continuous(limits = c(0,0.04),labels = NULL) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "",
+         title = "Something Happening Between 1870 - 2018",
+         subtitle = "Ten Year Moving Average + Linear Trend") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE,cache=TRUE}
+
+#this chunk plots the first thing
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "",
+         title = "Something Happening Between 1870 - 2018",
+         subtitle = "Ten Year Moving Average + Linear Trend") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    # geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    # geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    # geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    # geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    # geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    # geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    #geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    # geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    # geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    # geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    # geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    # geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    # geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    # geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    # geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    # geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    # geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    # geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    # geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    # geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    # geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    # geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    # geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    # geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    # geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    # geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    # geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    # geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    # geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    # geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    # geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    # geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    # geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    # geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    # geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    # geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+```{r echo=FALSE, fig.align='center', fig.asp=3/4, fig.retina=3, message=FALSE, warning=FALSE, dpi=300, out.width="100%", paged.print=FALSE, cache=TRUE}
+
+#this chunk plots the first thing
+
+pal <- fromthebottom::phish_palettes$hoist
+
+p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
+    geom_line(size=1.5,
+              color = "red",alpha = 1) +
+    geom_line(aes(y=rollmean(hr_to_ab_ratio, 10, na.pad=TRUE)),
+              size = 1.5,
+              col = "blue",
+              lty = "dashed",alpha = 1) +
+    #geom_smooth(method=lm , color="green", fill="#69b3a2", se=TRUE) +
+    # geom_rect(aes(xmin=1870,xmax=1919,ymin=0,ymax=Inf),fill = pal[1],alpha=.01) +
+    # geom_rect(aes(xmin=1920,xmax=1941,ymin=0,ymax=Inf),fill = pal[2],alpha=.01) +
+    # geom_rect(aes(xmin=1942,xmax=1960,ymin=0,ymax=Inf),fill = pal[3],alpha=.01) +
+    # geom_rect(aes(xmin=1961,xmax=1976,ymin=0,ymax=Inf),fill = pal[4],alpha=.01) +
+    # geom_rect(aes(xmin=1977,xmax=1992,ymin=0,ymax=Inf),fill = pal[5],alpha=.01) +
+    # geom_rect(aes(xmin=1994,xmax=2005,ymin=0,ymax=Inf),fill = pal[6],alpha=.01) +
+    geom_rect(aes(xmin=2006,xmax=2018,ymin=0,ymax=Inf),fill = pal[7],alpha=.01) +
+    scale_y_continuous(limits = c(0,0.04)) +
+    scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
+    labs(x = "",
+         y = "Home Runs Per At Bat",
+         title = "Something Happened  1870 - 2018",
+         subtitle = "Ten Year Moving Average") +
+    theme_minimal()
+
+
+p
+```
+---
+class: center, middle
+background-image: url(images/home_run.png)
+background-size: contain
+### Home Runs Per At Bat By Year
+---
+class: middle, left, inverse
+--
+`r fa("baseball-ball", fill = "black")`  Changes in home run outputs were related to the changes in the game or the environment
+
+--
+`r fa("baseball-ball", fill = pal[1])` Dead Ball Era: Pitchers dominated with a larger strike zone reused 'dead' baseballs, and the ability to apply substances to the ball.
+
+--
+`r fa("baseball-ball", fill = pal[2])`  Live Ball Era: Clean baseballs and prevention of foreign substances moved the game away from pitchers and toward hitters.
+
+--
+`r fa("baseball-ball", fill = pal[3])`  WWII: Many of the best players went to fight in the war but the game kept going rather than being canceled. 
+
+--
+`r fa("baseball-ball", fill = pal[4])`  Expansion and Awful Ballparks: Strike zone was changed again making it easier for pitchers. But then, the mound was lowered making it easier for batters. 1973 introduced the designated hitter.
+
+--
+`r fa("baseball-ball", fill = pal[5])`  Free Agency: The financial market shifted making it possible for wealthy teams to have great pitching AND hitting. Also, ballparks got more home run friendly. 
+
+--
+`r fa("baseball-ball", fill = pal[6])`  Steroids: Fans loved seeing home runs and the players on the field became better at hitting home runs, due in part to performance enhancing drugs and hitter-friendly ballparks.
+
+--
+`r fa("baseball-ball", fill = pal[6])`  Post Steriods: Players were tested and banned for using performance enhancing drugs.
+---
+class: top, middle
+background-size: contain
+
+.pull-left[
+
+![](images/action.jpg)
+
+]
+
+.pull-right[
+
+#### How Do We Move From Question to Insight to Action?
+
+* Data Literacy also involves our collective efforts to actually _make decisions_ that are informed by data
+* We must learn to communicate results clearly and advocate for policy interventions
+
+]
+---
+class: top, left
+background-image: url(images/flashlight_2.jpg)
+background-size: contain
+#### Thank you Tuba for the invitation
+#### This slide deck was created using R, Rmarkdown and the Xaringan Package
+#### Photos pulled from Google Photos and Unsplash. 
+#### Errors, Typos, and Oopsies Are Mine. Please let me know if you see something wacky
+#### Code and Slides available at:
+#### [bradweiner.info/talk](https://bradweiner.info/talk/)
+### Go Ahead. Ask me anything!
+
+### Contact
+####  `r fa("envelope", fill = "steelblue")`   brad.weiner@colorado.edu
+####  `r fa("twitter", fill = "steelblue")`    @brad_weiner
+####  `r fa("desktop", fill = "steelblue")`    bradweiner.info
+---
