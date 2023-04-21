@@ -1,8 +1,8 @@
 ---
 title: "Data Literacy is Data ~~Governance~~ Enablement"
-subtitle: "Data Community of Practice IRL Conference"
+subtitle: "Because Documentation and Access Controls Aren't Enough"
 author: "Brad Weiner | Chief Data Officer"
-institute: "University of Colorado Boulder"
+institute: "Data CoP IRL Conference, University of Colorado Boulder"
 date: "2023-04-21"
 output:
   xaringan::moon_reader:
@@ -34,6 +34,10 @@ style_duo(primary_color = "#000000",
           title_slide_background_image = "images/puzzle.jpg",
           title_slide_text_color = "black")
 ```
+---
+class: top, left
+background-image: url(images/gitpull.png)
+background-size: contain
 ---
 class: inverse, left, top
 ```{r load_packages, message=FALSE, warning=FALSE, include=FALSE} 
@@ -68,7 +72,7 @@ background-size: contain
 .pull-right[
 
 
-* Learn How Data Literacy is Part of Data Governance
+* Learn How Data Literacy is Part of Data ~~Governance~~ Enablement
 * Practice asking better research questions
 * Discuss how to tell better data stories
 * Discuss how to convert data to insight to action
@@ -78,7 +82,7 @@ background-size: contain
 class: left, top, middle
 background-size: contain
 
-#### Data Governance Includes
+### Data ~~Governance~~ Enablement Includes
 
 .pull-left[
 
@@ -97,7 +101,6 @@ background-size: contain
 * Data Catalog
 * Lifecycle Management
 * _Data Literacy_
-
 
 ]
 ---
@@ -624,7 +627,7 @@ p
 class: center, middle
 background-image: url(images/home_run.png)
 background-size: contain
-### Something Happened By Year
+### Home Runs Per At Bat by Year
 ---
 class: middle, left, inverse
 --
