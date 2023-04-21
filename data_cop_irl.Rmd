@@ -104,6 +104,8 @@ background-size: contain
 class: left, top, middle
 background-size: contain
 
+### How Can Data Literacy Help Campus?
+
 .pull-left[
 
 ![](images/whycare.jpg)
@@ -112,7 +114,6 @@ background-size: contain
 
 .pull-right[
 
-#### How Can Data Literacy Help Campus?
 
 * We can ask better questions
 * We can communicate better with data
@@ -125,6 +126,8 @@ background-size: contain
 class: left, top, middle
 background-size: contain
 
+### A Scenario:
+
 .pull-left[
 
 ![](images/steamed_hams.jpg)
@@ -133,7 +136,6 @@ background-size: contain
 
 .pull-right[
 
-#### A Scenario:
 
 * You work for a fast food chain
 * Their product team wants you to create a new "healthy" option
@@ -159,6 +161,8 @@ kable(td) %>% column_spec(1,bold = TRUE) %>% kable_styling(font_size = 12)
 class: left, top, middle
 background-size: contain
 
+### Types of Research Questions
+
 .pull-left[
 
 ![](images/joke.jpg)
@@ -167,7 +171,7 @@ background-size: contain
 
 .pull-right[
 
-#### Types of Research Questions
+
 
 * Descriptive (How many?)
 * Correlational (Does x relate to y?)
@@ -179,6 +183,8 @@ background-size: contain
 ---
 class: left, top, middle, inverse
 background-size: contain
+
+### Practice Asking Some Research Questions
 
 .pull-left[
 
@@ -194,8 +200,6 @@ kable(td) %>% column_spec(1,bold = TRUE) %>% kable_styling(font_size = 10)
 
 .pull-right[
 
-#### Practice Asking Some Research Questions
-
 * Descriptive (How many?)
 * Correlational (Does x relate to y?)
 * Predictive (What would we estimate)
@@ -206,6 +210,8 @@ kable(td) %>% column_spec(1,bold = TRUE) %>% kable_styling(font_size = 10)
 class: left, top, middle
 background-size: contain
 
+### Part of Data Literacy is Communicating with Data
+
 .pull-left[
 
 ![](images/storytelling.jpg)
@@ -213,8 +219,6 @@ background-size: contain
 ]
 
 .pull-right[
-
-#### Part of Data Literacy is Communicating with Data
 
 * Let's tell a story about some data trends
 * These data are real
@@ -377,7 +381,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -410,7 +414,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -443,7 +447,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -476,7 +480,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -509,7 +513,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -542,7 +546,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -575,7 +579,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -608,7 +612,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
     scale_y_continuous(limits = c(0,0.04)) +
     scale_x_continuous(limits = c(1870,2025),n.breaks = 20) +
     labs(x = "",
-         y = "Home Runs Per At Bat",
+         y = "Something Happened",
          title = "Something Happened  1870 - 2018",
          subtitle = "Ten Year Moving Average") +
     theme_minimal()
@@ -620,7 +624,7 @@ p
 class: center, middle
 background-image: url(images/home_run.png)
 background-size: contain
-### Home Runs Per At Bat By Year
+### Something Happened By Year
 ---
 class: middle, left, inverse
 --
@@ -645,12 +649,12 @@ class: middle, left, inverse
 `r fa("baseball-ball", fill = pal[6])`  Steroids: Fans loved seeing home runs and the players on the field became better at hitting home runs, due in part to performance enhancing drugs and hitter-friendly ballparks.
 
 --
-`r fa("baseball-ball", fill = pal[6])`  Post Steriods: Players were tested and banned for using performance enhancing drugs.
+`r fa("baseball-ball", fill = pal[6])`  Post Steriods: Players were tested and banned for using performance enhancing drugs. Game was optimized for home runs.
 ---
-class: center, middle, left
+class: left, top, middle
 background-size: contain
 
-#### How Do We Move From Question to Insight to Action?
+### How Do We Move From Question to Insight to Action?
 
 .pull-left[
 
@@ -784,7 +788,7 @@ kable(retn_test,row.names = F) %>% column_spec(2,bold = TRUE) %>% kable_styling(
 class: center, middle, left
 background-size: contain
 
-#### Based on the Insights from this Analyis, What Recommendations Would We Make?
+### Based on the Insights from this Analyis, What Recommendations Would We Make?
 
 .pull-left[
 
