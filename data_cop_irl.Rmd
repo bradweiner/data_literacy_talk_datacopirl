@@ -624,7 +624,7 @@ p <- ggplot(b.agg, aes(x = year_id, y = hr_to_ab_ratio)) +
 p
 ```
 ---
-class: center, middle
+class: center, middle, inverse
 background-image: url(images/home_run.png)
 background-size: contain
 ### Home Runs Per At Bat by Year
